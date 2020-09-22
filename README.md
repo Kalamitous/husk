@@ -46,7 +46,7 @@ end
 
 ## API
 
-* [husk](#husk)
+* [husk](#husk-1)
 * [world](#world)
 * [shape](#shape)
 
