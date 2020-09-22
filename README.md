@@ -105,7 +105,7 @@ Moves the shape to the given position and does not check for collisions.
 - `x, y` Top-left position.
 
 ```lua
-shape:rotate(deg, filter)
+shape:rotate(deg, < filter >)
 ```
 Rotates the shape around its center.
 - `deg` Degree in radians.
@@ -162,6 +162,7 @@ git clone https://github.com/Kalamitous/husk.git
 ```lua
 local husk = require 'path.to.husk'
 ```
+
 
 ## Contributing
 
