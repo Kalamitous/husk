@@ -45,6 +45,25 @@ function Shape:moveTo(x, y)
     self.world:_addShape(self)
 end
 
+function Shape:rotate(deg, filter)
+    local center_x, center_y = self:getCenter()
+    for i = 1, #self.vertices, 2 do
+        local x = self.vertices[i] + self.pos.x
+        local y = self.vertices[i + 1] + self.pos.y
+        local rotated_x = center_x + (x - center_x) * math.cos(deg) - (y - center_y) * math.sin(deg)
+        local rotated_y = center_y + (x - center_x) * math.sin(deg) + (y - center_y) * math.cos(deg)
+        self.vertices[i] = rotated_x - self.pos.x
+        self.vertices[i + 1] = rotated_y - self.pos.y
+    end
+    self.world:_removeShape(self)
+    self.pos = self.pos + Vector:new(self:_resolveCollisions(filter, true))
+    self.world:_addShape(self)
+end
+
+function Shape:draw()
+    love.graphics.polygon('line', unpack(self:_getVertices()))
+end
+
 function Shape:collidesWith(other)
     local axes = self:_calculateNormals()
     for _, v in ipairs(other:_calculateNormals()) do
@@ -79,10 +98,6 @@ function Shape:collidesWith(other)
     return true, mtv.x, mtv.y
 end
 
-function Shape:draw()
-    love.graphics.polygon('line', unpack(self:_getVertices()))
-end
-
 function Shape:getBoundingBox()
     local vertices = self:_getVertexPairs()
     local min = Vector:new(math.huge, math.huge)
@@ -114,7 +129,7 @@ function Shape:getNeighbors(filter)
                     end
                 end
                 if not is_duplicate then
-                    if not filter or filter(s) then
+                    if not filter or filter(self, s) then
                         table.insert(neighbors, s)
                     end
                 end
@@ -137,8 +152,8 @@ function Shape:getCollisions(filter)
     return collisions
 end
 
-function Shape:_resolveCollisions(filter)
-    if self.lock_dir then return 0, 0 end
+function Shape:_resolveCollisions(filter, is_rotating)
+    if not is_rotating and self.lock_dir then return 0, 0 end
 
     local axes = {}
     local major_magnitude = 0

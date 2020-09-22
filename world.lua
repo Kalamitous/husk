@@ -60,15 +60,15 @@ function World:addCircle(x, y, r, s)
 end
 
 function World:_addShape(shape)
-    local buckets = self:_getBuckets(shape)
-    for _, v in ipairs(buckets) do
+    local cells = self:_getCells(shape)
+    for _, v in ipairs(cells) do
         table.insert(v, shape)
     end
 end
 
 function World:_removeShape(shape)
-    local buckets = self:_getBuckets(shape)
-    for _, v in ipairs(buckets) do
+    local cells = self:_getCells(shape)
+    for _, v in ipairs(cells) do
         for k, s in ipairs(v) do
             if s == shape then
                 table.remove(v, k)
@@ -81,20 +81,20 @@ function World:_hash(x, y)
     return math.floor(x / self.cell_size), math.floor(y / self.cell_size)
 end
 
-function World:_getBuckets(shape)
-    local buckets = {}
+function World:_getCells(shape)
+    local cells = {}
     local x, y, w, h = shape:getBoundingBox()
     local i1, j1 = self:_hash(x, y)
     local i2, j2 = self:_hash(x + w, y + h)
     for i = i1, i2 + 1 do
         for j = j1, j2 + 1 do
-            table.insert(buckets, self:_getBucket(i, j))
+            table.insert(cells, self:_getCell(i, j))
         end
     end
-    return buckets
+    return cells
 end
 
-function World:_getBucket(i, j)
+function World:_getCell(i, j)
     self.spatial_hash[i] = self.spatial_hash[i] or {}
     self.spatial_hash[i][j] = self.spatial_hash[i][j] or {}
     return self.spatial_hash[i][j]
